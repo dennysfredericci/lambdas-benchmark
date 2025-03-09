@@ -2,7 +2,6 @@ package com.devoctans.lambda;
 
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
@@ -16,16 +15,18 @@ public class CreatePersonFunction implements Function<Person, String> {
     
     private final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CreatePersonFunction.class);
     
+    private final DynamoDbClient dynamoDbClient;
+    
+    public CreatePersonFunction(DynamoDbClient dynamoDbClient) {
+        this.dynamoDbClient = dynamoDbClient;
+    }
+    
     @Override
     public String apply(Person person) {
         
         PutItemRequest request = PutItemRequest.builder()
                 .tableName("people")
                 .item(map(person))
-                .build();
-        
-        DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
-                .region(Region.EU_WEST_1)
                 .build();
         
         dynamoDbClient.putItem(request);

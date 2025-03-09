@@ -30,9 +30,11 @@ Resources:
 
   ApiGatewayDeployment:
     Type: 'AWS::ApiGateway::Deployment'
+    DependsOn: ApiGatewayMethod
     Properties:
       RestApiId: !Ref ApiGatewayRestApi
-      StageName: 'prod'
+      StageName: 'lambdas'
+
 
   LambdaExecutionRole:
     Type: 'AWS::IAM::Role'
@@ -95,4 +97,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: 'API Gateway endpoint URL for stage'
-    Value: !Sub 'https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/person'
+    Value: !Sub 'https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/lambdas/person'
