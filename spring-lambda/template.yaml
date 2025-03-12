@@ -54,7 +54,10 @@ Resources:
               - Effect: 'Allow'
                 Action:
                   - 'dynamodb:PutItem'
-                Resource: !GetAtt DynamoDBTable.Arn
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
 
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
@@ -70,7 +73,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref DynamoDBTable
-          LOGGING_LEVEL_ROOT: 'INFO'
+          MAIN_CLASS: 'com.devoctans.lambda.Application'
 
   LambdaPermission:
     Type: 'AWS::Lambda::Permission'
@@ -93,6 +96,12 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
+  LambdaLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${LambdaFunction}'
+      RetentionInDays: 14
 
 Outputs:
   ApiUrl:

@@ -15,7 +15,7 @@ public class Application {
      * In this case is not empty to make it easier to run the application from the IDE and test the function
      */
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        //SpringApplication.run(Application.class, args);
     }
     
     
