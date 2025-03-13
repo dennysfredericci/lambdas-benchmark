@@ -1,0 +1,7 @@
+ApiGatewayName: 'spring-lambda-gateway'
+StageName: 'spring-lambda'
+LambdaFunctionName: 'spring-lambda'
+S3BucketName: 'lambda-deployment-fredericci'
+S3Key: 'spring-lambda.jar'
+DynamoDBTableName: 'people'
+LambdaTimeout: 120

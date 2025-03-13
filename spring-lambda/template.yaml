@@ -1,9 +1,45 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  ApiGatewayName:
+    Type: String
+    Default: 'spring-lambda-gateway'
+    Description: 'Name of the API Gateway'
+  
+  StageName:
+    Type: String
+    Default: 'spring-lambda'
+    Description: 'Stage name for the API Gateway deployment'
+  
+  LambdaFunctionName:
+    Type: String
+    Default: 'spring-lambda'
+    Description: 'Name of the Lambda function'
+  
+  S3BucketName:
+    Type: String
+    Description: 'S3 bucket name where the Lambda code is stored'
+    Default: 'lambda-deployment-fredericci'
+
+  S3Key:
+    Type: String
+    Description: 'S3 key for the Lambda code'
+    Default: 'spring-lambda.jar'
+  
+  DynamoDBTableName:
+    Type: String
+    Default: 'people'
+    Description: 'Name of the DynamoDB table'
+  
+  LambdaTimeout:
+    Type: Number
+    Default: 120
+    Description: 'Timeout for the Lambda function in seconds'
+
 Resources:
   ApiGatewayRestApi:
     Type: 'AWS::ApiGateway::RestApi'
     Properties:
-      Name: 'MyApi'
+      Name: !Ref ApiGatewayName
 
   ApiGatewayResource:
     Type: 'AWS::ApiGateway::Resource'
@@ -11,14 +47,14 @@ Resources:
       ParentId: !GetAtt
         - ApiGatewayRestApi
         - RootResourceId
-      PathPart: 'person'
+      PathPart: '{proxy+}'
       RestApiId: !Ref ApiGatewayRestApi
 
   ApiGatewayMethod:
     Type: 'AWS::ApiGateway::Method'
     Properties:
       AuthorizationType: 'NONE'
-      HttpMethod: 'POST'
+      HttpMethod: 'ANY'
       ResourceId: !Ref ApiGatewayResource
       RestApiId: !Ref ApiGatewayRestApi
       Integration:
@@ -33,8 +69,7 @@ Resources:
     DependsOn: ApiGatewayMethod
     Properties:
       RestApiId: !Ref ApiGatewayRestApi
-      StageName: 'lambdas'
-
+      StageName: !Ref StageName
 
   LambdaExecutionRole:
     Type: 'AWS::IAM::Role'
@@ -62,14 +97,14 @@ Resources:
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: 'spring-lambda'
+      FunctionName: !Ref LambdaFunctionName
       Handler: 'org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest'
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
-        S3Bucket: 'lambda-deployment-fredericci'
-        S3Key: 'spring-lambda.jar'
+        S3Bucket: !Ref S3BucketName
+        S3Key: !Ref S3Key
       Runtime: 'java21'
-      Timeout: 120
+      Timeout: !Ref LambdaTimeout
       Environment:
         Variables:
           TABLE_NAME: !Ref DynamoDBTable
@@ -86,7 +121,7 @@ Resources:
   DynamoDBTable:
     Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: 'people'
+      TableName: !Ref DynamoDBTableName
       AttributeDefinitions:
         - AttributeName: 'id'
           AttributeType: 'S'
@@ -101,9 +136,9 @@ Resources:
     Type: 'AWS::Logs::LogGroup'
     Properties:
       LogGroupName: !Sub '/aws/lambda/${LambdaFunction}'
-      RetentionInDays: 14
+      RetentionInDays: 3
 
 Outputs:
   ApiUrl:
     Description: 'API Gateway endpoint URL for stage'
-    Value: !Sub 'https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/lambdas/person'
+    Value: !Sub 'https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/execute'

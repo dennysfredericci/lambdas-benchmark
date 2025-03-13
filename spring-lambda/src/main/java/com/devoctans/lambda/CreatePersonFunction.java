@@ -13,7 +13,7 @@ import java.util.function.Function;
 @Component
 public class CreatePersonFunction implements Function<Person, String> {
     
-    private final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CreatePersonFunction.class);
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CreatePersonFunction.class);
     
     private final DynamoDbClient dynamoDbClient;
     
