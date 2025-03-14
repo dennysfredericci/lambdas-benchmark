@@ -33,7 +33,7 @@ public class CreatePersonFunction implements Function<Person, String> {
         
         LOGGER.info("Person saved to DynamoDB {}", person);
         
-        return "OK";
+        return "{ \"status\": \"OK\" \"message\": \"Person saved to DynamoDB\" }";
     }
     
     private static Map<String, AttributeValue> map(Person person) {

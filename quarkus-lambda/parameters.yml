@@ -1,0 +1,7 @@
+ApiGatewayName: 'quarkus-lambda-gateway'
+StageName: 'quarkus-lambda'
+LambdaFunctionName: 'quarkus-lambda'
+S3BucketName: 'lambda-deployment-fredericci'
+S3Key: 'quarkus-lambda.zip'
+DynamoDBTableName: 'people'
+LambdaTimeout: 120

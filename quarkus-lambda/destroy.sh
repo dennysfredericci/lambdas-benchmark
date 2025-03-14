@@ -1,0 +1,1 @@
+sam delete --stack-name quarkus-lambdas-benchmark
