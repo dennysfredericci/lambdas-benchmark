@@ -24,6 +24,9 @@ Parameters:
     Type: String
     Description: 'S3 key for the Lambda code'
     Default: 'spring-lambda.jar'
+
+  LambdaVersion:
+    Type: String
   
   DynamoDBTableName:
     Type: String
@@ -60,9 +63,7 @@ Resources:
       Integration:
         IntegrationHttpMethod: 'POST'
         Type: 'AWS_PROXY'
-        Uri: !Sub
-          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
-          - LambdaFunction: !GetAtt LambdaFunction.Arn
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionVersion}/invocations'
 
   ApiGatewayDeployment:
     Type: 'AWS::ApiGateway::Deployment'
@@ -105,16 +106,25 @@ Resources:
         S3Key: !Ref S3Key
       Runtime: 'java21'
       Timeout: !Ref LambdaTimeout
+      MemorySize: 512
       Environment:
         Variables:
           TABLE_NAME: !Ref DynamoDBTable
           MAIN_CLASS: 'com.devoctans.lambda.Application'
+      SnapStart:
+        ApplyOn: 'PublishedVersions'
+
+  LambdaFunctionVersion:
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Description: !Ref LambdaVersion
 
   LambdaPermission:
     Type: 'AWS::Lambda::Permission'
     Properties:
       Action: 'lambda:InvokeFunction'
-      FunctionName: !Ref LambdaFunction
+      FunctionName: !Ref LambdaFunctionVersion
       Principal: 'apigateway.amazonaws.com'
       SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*'
 
@@ -142,3 +152,5 @@ Outputs:
   ApiUrl:
     Description: 'API Gateway endpoint URL for stage'
     Value: !Sub 'https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/execute'
+
+#arn:aws:lambda:eu-west-1:102242991276:function:spring-lambda:4

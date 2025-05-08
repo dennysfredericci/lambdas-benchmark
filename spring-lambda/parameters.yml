@@ -2,6 +2,7 @@ ApiGatewayName: 'spring-lambda-gateway'
 StageName: 'spring-lambda'
 LambdaFunctionName: 'spring-lambda'
 S3BucketName: 'lambda-deployment-fredericci'
-S3Key: 'spring-lambda.jar'
+S3Key: BASE_FILE_NAME
 DynamoDBTableName: 'people'
 LambdaTimeout: 120
+LambdaVersion: VERSION

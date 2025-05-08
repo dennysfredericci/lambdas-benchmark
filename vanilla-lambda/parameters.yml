@@ -1,0 +1,7 @@
+ApiGatewayName: 'vanilla-lambda-gateway'
+StageName: 'vanilla-lambda'
+LambdaFunctionName: 'vanilla-lambda'
+S3BucketName: 'lambda-deployment-fredericci'
+S3Key: 'vanilla-lambda.jar'
+DynamoDBTableName: 'people'
+LambdaTimeout: 120
